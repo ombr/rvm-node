@@ -1,0 +1,47 @@
+name : rvm-node
+version : 1.0.0
+inherits : wercker/ubuntu12.04-webessentials@1.0.4
+type : main
+platform : ubuntu@12.04
+packages :
+  - nodejs@0.10.33
+  - ruby@2.0.0-p594
+keywords:
+  - nodejs
+  - ruby
+script: |
+  export NODEVERSION=0.10.33
+  sudo apt-get update
+  sudo apt-get install wget build-essential
+  cd $HOME
+  mkdir nodeinstall
+  cd nodeinstall
+  wget http://nodejs.org/dist/v$NODEVERSION/node-v$NODEVERSION.tar.gz
+  tar xzf node-v$NODEVERSION.tar.gz
+  cd node-v$NODEVERSION
+  ./configure
+  make
+  sudo make install
+  cd $HOME
+  rm -fr nodeinstall
+  node -v
+  export RUBYVERSION=2.0.0-p594
+  sudo apt-get update
+  sudo apt-get install git zlib1g-dev libreadline-dev libqtwebkit-dev
+  sudo apt-get remove ruby1.9.1
+  cd $HOME
+  mkdir rubyinstall
+  cd rubyinstall
+  wget ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-$RUBYVERSION.tar.gz
+  tar xzvf ruby-$RUBYVERSION.tar.gz
+  cd ruby-$RUBYVERSION
+  ./configure --with-readline-dir=/usr/include/readline --with-openssl-dir=/usr/include/openssl
+  make
+  make test
+  sudo make install
+  cd $HOME
+  rm -fr rubyinstall
+  echo "gem: --no-rdoc --no-ri" >> $HOME/.gemrc
+  sudo gem install bundler -v "1.5"
+  echo "RAILS_ENV=test" | sudo tee -a /etc/environment
+  echo "RACK_ENV=test" | sudo tee -a /etc/environment
